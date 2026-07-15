@@ -1,0 +1,318 @@
+---
+title: "ri-district-vs-charter-performance-analysis"
+author: "RM"
+date: "2026-02-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+setwd("/Users/ryanmunroe/Downloads")
+```
+
+### Library / Package Setup ###
+
+```{r}
+library(tidyr)
+library(tidyverse)
+library(broom)
+library(ggplot2)
+```
+
+### Load Data ###
+
+```{r}
+school_indicator_data <- read.csv("school_indicator_data.csv")
+
+lea_indicator_data <- read.csv("lea_indicator_data.csv")
+
+csi_schools <- read.csv("csi_schools_data.csv")
+
+atsi_groups <- read.csv("atsi_groups_data.csv")
+
+tsi_groups <- read.csv("tsi_groups_data.csv")
+
+lea_low_performing_subgroups <- read.csv("lea_low_performing_subgroups.csv")
+```
+
+### Fixing Column Labels (run only once) ###
+
+```{r}
+names(school_indicator_data) <- school_indicator_data[1, ]
+school_indicator_data <- school_indicator_data[-1, , drop = FALSE]
+rownames(school_indicator_data) <- NULL
+
+names(lea_indicator_data) <- lea_indicator_data[1, ]
+lea_indicator_data <- lea_indicator_data[-1, , drop = FALSE]
+rownames(lea_indicator_data) <- NULL
+
+names(csi_schools) <- csi_schools[1, ]
+csi_schools <- csi_schools[-1, , drop = FALSE]
+rownames(csi_schools) <- NULL
+
+names(atsi_groups) <- atsi_groups[1, ]
+atsi_groups <- atsi_groups[-1, , drop = FALSE]
+rownames(atsi_groups) <- NULL
+
+names(tsi_groups) <- tsi_groups[1, ]
+tsi_groups <- tsi_groups[-1, , drop = FALSE]
+rownames(tsi_groups) <- NULL
+
+names(lea_low_performing_subgroups) <- lea_low_performing_subgroups[1, ]
+lea_low_performing_subgroups <- lea_low_performing_subgroups[-1, , drop = FALSE]
+rownames(lea_low_performing_subgroups) <- NULL
+```
+
+```{r}
+# unique(school_indicator_data$District)
+# unique(school_indicator_data$School)
+```
+
+```{r}
+school_indicator_data$`School Code` <- as.character(school_indicator_data$`School Code`)
+
+selected_charter_schools <- c("41190", "41607", "28614", "41605", "41606", "28609", "41604", "28615", "07135", "39601", "26602", "08603", "08605", "08601", "08604", "08602", "08606", "84601", "39603", "48601", "48602", "26601", "32601", "69601", "51601", "51602", "51603", "83601", "28607", "39602", "79601", "04602", "46602", "28611", "23601", "97601", "28613", "04601", "28606", "28608")
+
+charter_df <- school_indicator_data[
+  school_indicator_data$`School Code` %in% selected_charter_schools, 
+]
+
+charter_df$charter_school_name <- charter_df$`School Name`
+
+selected_lea_public_schools <- c("16108","17112","30104","30105","35127","10123","31107","32108","01109","36111","07120","36106","03105","24106","07127","23114","23113","28162","16103","06116","33108","33110","35138","28151","28130","04106","31109","38111","33105","35137","35133","35142","06121","97101","28127","28194","13104","32112","38106","36104","36113","36103","06109","07129","23105","18101","28189","28153","26105","03107","07116","35139","16109","07121","39123","39131","39132","35119","01105","35135","39101","28161","26119","35128","30102","28149","07137","98109","06112","27104","07115","96113","26109","09102","24107","10106","15101","15102","38107","38104","08110","16112","26103","08115","10113","39128","96112","39120","28103","28157","17109","17117","17110","35123","17106","26107","26121","38105","28160","32113","09107","27111","97103","19111","97102","28150","96107","10125","20102","20104","20103","28143","28145","26111","01104","16111","23103","08116","23108","24105","30106","25110","25108","25109","17113","35101","07103","35104","31104","07136","10124","35132","07123","32107","35134","31106","28165","33107","99102","99101","27106","27112","39133","26110","01103","28193","04112","04118","31108","28142","98105","10122","28138","28156","96106","28147","21111","26106","10116","26122","06104","28121","10114","28181","19106","09103","07125","28115","98106","08112","03108","28199","08107","01106","01108","39118","24112","06117","22101","28119","32114","16106","03101","03109","03104","04104","12101","35131","04108","28139","24109","98108","98101","98103","26118","98104","21107","28164","30103","96105","08109","35136","06119","07104","07113","07126","08114","08121","26116","23112","04115","24111","28113","24108","28163","36109","28187","35121","16114","09106","10112","07118","07130","10109","10104","07117","26120","04101","10117","28137","97105","97106","26113","23109","26115","13103","19107","23110","26125","28134","21106","09105","07122","08108","19117","19114","09108","07124","28135","07119","07128","39119","28182","16110","38109","35114","24110","23111")
+
+lea_public_df <- school_indicator_data [ 
+  school_indicator_data$`School Code` %in% selected_lea_public_schools,
+  ]
+
+lea_public_df$public_school_name <- lea_public_df$`School Name`
+``` 
+
+```{r}
+na_counts <- charter_df %>%
+  summarise(
+    STAR_score_NA = sum(is.na(`2018 Star Rating`)),
+  )
+
+print(na_counts)
+```
+
+### STAR Cleaning ###
+
+```{r}
+star_columns <- names(charter_df) %>%
+  stringr::str_subset("Star Rating")
+
+star_columns
+
+charter_df[star_columns] <- lapply(charter_df[star_columns], as.numeric)
+lea_public_df[star_columns] <- lapply(lea_public_df[star_columns], as.numeric)
+
+charter_all_students <- charter_df %>%
+  dplyr::filter(Group == "All Students")
+
+public_all_students <- lea_public_df %>%
+  dplyr::filter(Group == "All Students")
+
+charter_all_students <- charter_all_students %>%
+  dplyr::filter(dplyr::if_all(dplyr::all_of(star_columns), ~ !is.na(.)))
+
+public_all_students <- public_all_students %>%
+  dplyr::filter(dplyr::if_all(dplyr::all_of(star_columns), ~ !is.na(.)))
+```
+
+### Average Star Comparison by Year ###
+
+```{r}
+charter_star_avg <- charter_all_students %>%
+  summarise(across(all_of(star_columns), ~ mean(as.numeric(.x), na.rm = TRUE))) %>%
+  tidyr::pivot_longer(everything(), names_to = "Year", values_to = "Charter_Avg")
+
+public_star_avg <- public_all_students %>%
+  summarise(across(all_of(star_columns), ~ mean(as.numeric(.x), na.rm = TRUE))) %>%
+  tidyr::pivot_longer(everything(), names_to = "Year", values_to = "Public_Avg")
+
+star_year_compare <- dplyr::left_join(charter_star_avg, public_star_avg, by = "Year")
+
+star_year_compare
+```
+
+```{r}
+trend_df <- data.frame(
+  Year = c(2018, 2019, 2022, 2023, 2024, 2025),
+  Charter = sapply(star_columns, function(col) {
+    mean(as.numeric(charter_all_students[[col]]))
+  }),
+  Public = sapply(star_columns, function(col) {
+    mean(as.numeric(public_all_students[[col]]))
+  })
+)
+
+ggplot(trend_df, aes(x = Year)) +
+  geom_line(aes(y = Charter, linetype = "Charter")) +
+  geom_point(aes(y = Charter)) +
+  geom_line(aes(y = Public, linetype = "Public LEA")) +
+  geom_point(aes(y = Public)) +
+  labs(
+    title = "Average STAR Rating Trends",
+    y = "Average STAR Rating"
+  ) +
+  theme_minimal()
+```
+
+### Testing by Year (if there is a significant difference in testing by year) ###
+
+```{r}
+for (col in star_columns) {
+
+  year <- stringr::str_extract(col, "\\d{4}")
+
+  charter_values <- as.numeric(charter_all_students[[col]])
+  public_values  <- as.numeric(public_all_students[[col]])
+
+  test <- t.test(charter_values, public_values)
+
+  cat("\n=============================\n")
+  cat("STAR Rating Year:", year, "\n")
+  cat("=============================\n")
+
+  print(test)
+}
+```
+
+##### (LOW SAMPLE SIZE FOR CHARTER SCHOOLS / LIMIT TO LOW SCORE OUTLIERS) #####
+
+```{r}
+charter_all_students$School_Type <- "Charter"
+public_all_students$School_Type  <- "Public LEA"
+
+combined_df <- bind_rows(charter_all_students, public_all_students)
+
+combined_long <- combined_df %>%
+  pivot_longer(
+    cols = all_of(star_columns),
+    names_to = "Year",
+    values_to = "Star"
+  ) %>%
+  mutate(
+    Year = gsub(" Star Rating", "", Year),
+    Star = as.numeric(Star)
+  )
+
+ggplot(combined_long, aes(x = School_Type, y = Star)) +
+  geom_boxplot() +
+  facet_wrap(~Year) +
+  labs(
+    title = "Distribution of STAR Ratings by School Type",
+    y = "STAR Rating"
+  ) +
+  theme_minimal()
+```
+
+### Comparing by district ###
+
+```{r}
+public_district_long <- data.frame()
+for(col in star_columns) {
+  temp <- aggregate(public_all_students[[col]] ~ District, data = public_all_students, 
+                    FUN = mean, na.rm = TRUE)
+  temp$Year <- col
+  names(temp) <- c("District", "Rating", "Year")
+  public_district_long <- rbind(public_district_long, temp)
+}
+public_district_long <- public_district_long[!is.na(public_district_long$Rating), ]
+
+charter_district_long <- data.frame()
+for(col in star_columns) {
+  temp <- aggregate(charter_all_students[[col]] ~ District, 
+                    data = charter_all_students, FUN = mean, na.rm = TRUE)
+  temp$Year <- col
+  names(temp) <- c("District", "Rating", "Year")
+  charter_district_long <- rbind(charter_district_long, temp)
+}
+charter_district_long <- charter_district_long[!is.na(charter_district_long$Rating), ]
+
+public_districts <- unique(public_district_long$District)
+charter_districts <- unique(charter_district_long$District)
+
+par(mfrow = c(3, 4))
+for(d in public_districts) {
+  ratings <- public_district_long$Rating[public_district_long$District == d]
+  hist(ratings, col = "#56B4E9", main = d, xlab = "STAR Rating", xlim = c(1, 4), breaks = 5)
+}
+
+par(mfrow = c(3, 4))
+for(d in charter_districts) {
+  ratings <- charter_district_long$Rating[charter_district_long$District == d]
+  hist(ratings, col = "#E69F00", main = d, xlab = "STAR Rating", xlim = c(1, 4), breaks = 5)
+}
+```
+
+### Heatmap of STAR scores by district for public and charter schools ###
+
+```{r}
+charter_df <- charter_df %>%
+  mutate(School_Type = "Charter")
+
+lea_public_df <- lea_public_df %>%
+  mutate(School_Type = "Public/Traditional")
+
+heatmap_df <- bind_rows(charter_df, lea_public_df) %>%
+  filter(Group == "All Students")
+
+heatmap_df <- heatmap_df %>%
+  mutate(across(contains("Star Rating"), as.numeric))
+
+heatmap_long <- heatmap_df %>%
+  pivot_longer(
+    cols = contains("Star Rating"),
+    names_to = "Year",
+    values_to = "StarScore"
+  )
+
+district_summary <- heatmap_long %>%
+  group_by(`District`, School_Type, Year) %>%
+  summarize(
+    Avg_Star = mean(StarScore, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+ggplot(
+  filter(district_summary, School_Type == "Charter"),
+  aes(x = `District`, y = Year, fill = Avg_Star)
+) +
+  geom_tile(color = "white") +
+  labs(
+    title = "Charter Schools: Average Star Ratings by District",
+    x = "District",
+    y = "Year",
+    fill = "Avg Star Rating"
+  ) +
+  theme_minimal(base_size = 16) +
+  theme(
+    axis.text.y = element_text(size = 12),
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 9),
+    plot.title  = element_text(size = 15, face = "bold", hjust = 1),
+  )
+
+ggplot(
+  filter(district_summary, School_Type == "Public/Traditional"),
+  aes(x = `District`, y = Year, fill = Avg_Star)
+) +
+  geom_tile(color = "white") +
+  labs(
+    title = "Public Schools: Average Star Ratings by District",
+    x = "District",
+    y = "Year",
+    fill = "Avg Star Rating"
+  ) +
+  theme_minimal(base_size = 16) +
+  theme(
+    axis.text.y = element_text(size = 12),
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 9),
+    plot.title  = element_text(size = 15, face = "bold")
+  )
+```
