@@ -1,0 +1,117 @@
+Rhode Island District vs. Charter School Performance Analysis
+
+Project Overview
+
+This project analyzed school performance data in Rhode Island to examine whether charter schools demonstrated stronger academic performance than traditional public schools. The analysis was developed during a school district internship and focused primarily on comparing school-level STAR ratings across charter and traditional public schools over multiple years.
+
+The project was designed to provide data-driven evidence for evaluating claims about the relative performance of charter schools and traditional public schools. The analysis used Rhode Island school and district data and combined data preparation, exploratory analysis, visualization, and statistical testing to compare performance patterns across school types.
+
+Research Question
+
+The primary question guiding the analysis was:
+
+Do Rhode Island charter schools demonstrate higher performance than traditional public schools based on STAR ratings?
+
+To investigate this question, STAR ratings were compared between selected charter schools and selected traditional public schools across the available years. The analysis also examined the distribution of ratings and differences between districts to provide additional context beyond a simple comparison of overall averages.
+
+Data
+
+The analysis used several Rhode Island education datasets containing school-, district-, and subgroup-level information. The primary datasets used in the analysis included school indicator data, LEA indicator data, CSI school data, AT/TSI group data, and low-performing subgroup data.
+
+For the primary comparison, schools were classified into two groups:
+
+- Charter schools
+- Traditional/Public LEA schools
+
+STAR rating variables were available for the following years:
+
+- 2018
+- 2019
+- 2022
+- 2023
+- 2024
+- 2025
+
+The analysis focused on the "All Students" group and removed records with missing STAR ratings across the years being compared. STAR rating fields were also converted to numeric values before analysis.
+
+Methodology
+
+The analysis was conducted in R using packages from the tidyverse ecosystem, along with broom and ggplot2.
+
+The data preparation process included correcting column labels, converting school codes to character values, selecting the schools used for the comparison, filtering to the All Students group, and converting STAR rating variables to numeric values.
+
+Average STAR ratings were then calculated separately for charter and traditional public schools for each available year. These averages were used to examine performance trends over time.
+
+To determine whether differences between the two school types were statistically significant, Welch two-sample t-tests were performed separately for each year. The analysis also used boxplots to compare the distribution of STAR ratings by school type and year. Additional district-level analyses examined the distribution of ratings within individual districts and produced heatmaps showing average STAR ratings by district and year.
+
+Results
+
+Overall STAR Rating Comparison
+
+Traditional public schools had a higher average STAR rating than charter schools in every year included in the analysis.
+
+Year    Charter Average    Public Average    Difference
+2018    2.65               2.86              0.21
+2019    2.74               2.94              0.20
+2022    2.22               2.71              0.49
+2023    2.35               2.73              0.38
+2024    2.43               2.82              0.38
+2025    2.48               2.85              0.38
+
+The largest observed difference occurred in 2022, when traditional public schools had an average STAR rating approximately 0.49 points higher than charter schools. The gap remained substantial in the subsequent years, with traditional public schools maintaining an advantage of approximately 0.38 points in 2023, 2024, and 2025.
+
+The trend therefore does not show charter schools outperforming traditional public schools on average STAR ratings. Instead, the traditional public school group had consistently higher average ratings throughout the period examined.
+
+Statistical Testing
+
+The year-by-year Welch two-sample t-tests provided additional context for these differences.
+
+In 2018, the difference was not statistically significant (p = 0.3449). The same was true in 2019 (p = 0.3805).
+
+The difference became statistically significant in 2022, when charter schools had an average rating of 2.22 compared with 2.71 for traditional public schools (p = 0.00346). The 95% confidence interval for the difference in means ranged from approximately -0.80 to -0.17, indicating that the traditional public school group had a statistically higher average rating for that year.
+
+The difference was also statistically significant in 2023 (p = 0.0279). Charter schools averaged 2.35 compared with 2.73 for traditional public schools.
+
+For 2024, the difference approached but did not reach the conventional 0.05 significance threshold (p = 0.0526). In 2025, the difference was also not statistically significant (p = 0.0822). Nevertheless, the traditional public school group continued to have the higher observed average in both years.
+
+Overall, the statistical analysis provides evidence of a meaningful difference favoring traditional public schools in 2022 and 2023, while the differences in the other analyzed years were not statistically significant.
+
+Distribution and District-Level Analysis
+
+The analysis also examined STAR rating distributions rather than relying exclusively on averages. Boxplots were created for charter and traditional public schools across each year, allowing differences in the spread and distribution of ratings to be evaluated.
+
+District-level analysis was conducted separately for the charter and traditional public school groups. Histograms were generated for individual districts, and average STAR ratings were summarized by district and year. Heatmaps were then created to visualize average STAR ratings across districts over time for both charter and traditional public schools.
+
+These additional analyses were intended to provide context for the overall comparison and show that school performance varies across districts rather than being determined solely by whether a school is classified as charter or traditional public.
+
+Interpretation
+
+The results do not support the conclusion that Rhode Island charter schools consistently outperform traditional public schools based on STAR ratings.
+
+Traditional public schools had higher average STAR ratings in all six years examined. The differences were statistically significant in 2022 and 2023, while differences in 2018, 2019, 2024, and 2025 did not meet the conventional threshold for statistical significance.
+
+The results therefore suggest that, within the schools and years included in this analysis, the available STAR-rating data provides stronger evidence of traditional public schools matching or exceeding charter-school performance than of a broad charter-school performance advantage.
+
+Importantly, the analysis does not establish that school type itself causes differences in performance. Differences in student populations, district characteristics, school composition, resources, or other factors could contribute to the observed results. The analysis should therefore be interpreted as a comparison of observed performance rather than a causal study of charter-school effectiveness.
+
+Limitations
+
+Several limitations should be considered when interpreting the findings.
+
+First, the charter-school comparison group was relatively small compared with the traditional public-school group. The original analysis specifically noted the low sample size for charter schools and the potential influence of low-score outliers.
+
+Second, the analysis uses STAR ratings as the primary measure of school performance. A single performance measure cannot capture every aspect of educational quality or student achievement.
+
+Third, the available STAR-rating years are not continuous. The analysis includes 2018, 2019, and 2022–2025, leaving a gap between 2019 and 2022. Consequently, changes during the missing period cannot be evaluated using this analysis.
+
+Finally, the analysis compares groups of schools rather than randomly assigning schools or students to charter and traditional public systems. As a result, the findings demonstrate differences in observed STAR ratings but cannot establish a causal relationship between school type and academic performance.
+
+Conclusion
+
+This analysis examined whether Rhode Island charter schools demonstrated stronger performance than traditional public schools using STAR ratings from multiple years.
+
+Across every year included in the analysis, traditional public schools had a higher average STAR rating than charter schools. The difference was statistically significant in 2022 and 2023, while differences in 2018, 2019, 2024, and 2025 were not statistically significant.
+
+The findings therefore do not support a broad claim that charter schools outperform traditional public schools based on the STAR-rating data examined. Instead, the results demonstrate the value of using multiple years of data, statistical testing, and district-level visualization when evaluating claims about school performance.
+
+This project demonstrates an end-to-end data analysis workflow involving data preparation, exploratory analysis, statistical testing, visualization, and interpretation of real-world education data.
