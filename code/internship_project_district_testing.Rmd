@@ -9,10 +9,6 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
-setwd("/Users/ryanmunroe/Downloads")
-```
-
 ### Library / Package Setup ###
 
 ```{r}
@@ -25,17 +21,17 @@ library(ggplot2)
 ### Load Data ###
 
 ```{r}
-school_indicator_data <- read.csv("school_indicator_data.csv")
+school_indicator_data <- read.csv("../data/raw/school_indicator_data.csv")
 
-lea_indicator_data <- read.csv("lea_indicator_data.csv")
+lea_indicator_data <- read.csv("../data/raw/lea_indicator_data.csv")
 
-csi_schools <- read.csv("csi_schools_data.csv")
+csi_schools <- read.csv("../data/raw/csi_schools_data.csv")
 
-atsi_groups <- read.csv("atsi_groups_data.csv")
+atsi_groups <- read.csv("../data/raw/atsi_groups_data.csv")
 
-tsi_groups <- read.csv("tsi_groups_data.csv")
+tsi_groups <- read.csv("../data/raw/tsi_groups_data.csv")
 
-lea_low_performing_subgroups <- read.csv("lea_low_performing_subgroups.csv")
+lea_low_performing_subgroups <- read.csv("../data/raw/lea_low_performing_subgroups.csv")
 ```
 
 ### Fixing Column Labels (run only once) ###
