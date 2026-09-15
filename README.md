@@ -163,7 +163,7 @@ ri-district-vs-charter-performance-analysis/
 │
 ├── report/
 │   ├── district_performance_analysis_report.txt
-│   └── ri-district-vs-charter-performance-analysis.pdf
+│   └── knitted_code_file.pdf
 │
 ├── visualizations/
 │   ├── avg_star_rating_line.png
